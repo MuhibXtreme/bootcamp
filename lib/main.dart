@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:from_ui/bottom_nav_bar.dart';
+import 'package:from_ui/googlemap.dart';
 import 'package:from_ui/home.dart';
 import 'package:from_ui/second_screen.dart';
 import 'package:from_ui/thirdscreen.dart';
@@ -32,7 +33,7 @@ class MyApp extends StatelessWidget {
       // home: const Form(),
       initialRoute: 'form',
       routes: {
-        'form': (context) => BottomNavBar(),
+        'form': (context) => GoogleMapp(),
         // 'home': (context) => Home(),
         'second': (context) => SecondScreen(),
       },
