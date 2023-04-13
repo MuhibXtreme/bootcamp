@@ -33,7 +33,9 @@ class MyApp extends StatelessWidget {
       // home: const Form(),
       initialRoute: 'form',
       routes: {
-        'form': (context) => GoogleMapp(),
+        'form': (context) => Home(
+              name: '',
+            ),
         // 'home': (context) => Home(),
         'second': (context) => SecondScreen(),
       },

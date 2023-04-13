@@ -1,6 +1,8 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
-import 'package:from_ui/main.dart';
-import 'package:from_ui/second_screen.dart';
+import 'package:from_ui/model.dart';
+import 'package:http/http.dart' as http;
 
 class Home extends StatefulWidget {
   final String name;
@@ -11,75 +13,243 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-  List data = ['Muhib', 'Aizaz', 'Usama', 'bilal'];
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    getdata();
+  }
 
-  List<Map<String, dynamic>> datalist = [
-    {
-      'name': 'Muhib',
-      'Designation': 'Flutter Devleoper',
-      'image':
-          'https://images.pexels.com/photos/1043471/pexels-photo-1043471.jpeg?auto=compress&cs=tinysrgb&w=1600',
-    },
-    {
-      'name': 'junaid',
-      'Designation': 'web Devleoper',
-      'image':
-          'https://images.pexels.com/photos/1040881/pexels-photo-1040881.jpeg?auto=compress&cs=tinysrgb&w=1600',
-    },
-    {
-      'name': 'abdullah',
-      'Designation': 'dotnet Devleoper',
-      'image':
-          'https://images.pexels.com/photos/697509/pexels-photo-697509.jpeg?auto=compress&cs=tinysrgb&w=1600',
-    },
-    {
-      'name': 'mahonoor',
-      'Designation': 'worrdpress Devleoper',
-      'image':
-          'https://images.pexels.com/photos/415829/pexels-photo-415829.jpeg?auto=compress&cs=tinysrgb&w=1600',
-    },
-    {
-      'name': 'zubair',
-      'Designation': 'Project manager',
-      'image':
-          'https://images.pexels.com/photos/1499327/pexels-photo-1499327.jpeg?auto=compress&cs=tinysrgb&w=1600',
-    },
-    {
-      'name': 'abc',
-      'Designation': 'abcdef',
-      'image':
-          'https://images.pexels.com/photos/1080213/pexels-photo-1080213.jpeg?auto=compress&cs=tinysrgb&w=1600',
-    },
-  ];
+  TextEditingController name = TextEditingController();
+  TextEditingController email = TextEditingController();
+  TextEditingController designation = TextEditingController();
+  TextEditingController phone = TextEditingController();
+  List<Record> employee = [];
+
+  void delete(int id) async {
+    var response = await http.delete(Uri.parse(
+        "https://6d47-2400-adcc-135-1500-25c9-f5e9-7aa4-3c74.ngrok-free.app/api/public/api/employ/$id"));
+    if (response.statusCode == 200) {
+      setState(() {});
+    }
+  }
+
+  Future<List> getdata() async {
+    var response = await http.get(Uri.parse(
+        'https://6d47-2400-adcc-135-1500-25c9-f5e9-7aa4-3c74.ngrok-free.app/api/public/api/employ'));
+
+    if (response.statusCode == 200) {
+      var data = jsonDecode(response.body);
+      employee = (data as List).map((e) => Record.fromJson(e)).toList();
+    }
+    return employee;
+  }
+
+  void add(String name, email, desg, ph) async {
+    var response = await http.post(
+        Uri.parse(
+            'https://6d47-2400-adcc-135-1500-25c9-f5e9-7aa4-3c74.ngrok-free.app/api/public/api/employ'),
+        body: {
+          "name": name,
+          "email": email,
+          "designation": desg,
+          "phone_no": ph,
+        });
+    if (response.statusCode == 200) {
+      setState(() {});
+    }
+  }
+
+  void update(int id, String name, email, desg, ph) async {
+    var response = await http.post(
+        Uri.parse(
+            'https://6d47-2400-adcc-135-1500-25c9-f5e9-7aa4-3c74.ngrok-free.app/api/public/api/employ/update'),
+        body: {
+          "id": "$id",
+          "name": name,
+          "email": email,
+          "designation": desg,
+          "phone_no": ph,
+        });
+    if (response.statusCode == 200) {
+      setState(() {});
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        // appBar: AppBar(
-        //   title: Text(widget.name),
-        //   centerTitle: true,
-        //   actions: [
-        //     IconButton(
-        //         onPressed: () {
-        //           Navigator.pushAndRemoveUntil(
-        //               context,
-        //               MaterialPageRoute(builder: (context) => MyApp()),
-        //               (route) => false);
-        //         },
-        //         icon: const Icon(Icons.logout))
-        //   ],
-        // ),
-        body: ListView.builder(
-            itemCount: datalist.length,
-            itemBuilder: (context, index) {
-              return ListTile(
-                leading: CircleAvatar(
-                  backgroundImage: NetworkImage(datalist[index]['image']),
-                ),
-                title: Text(datalist[index]['name']),
-                trailing: const Icon(Icons.abc),
-                subtitle: Text(datalist[index]['Designation']),
-              );
-            }));
+      appBar: AppBar(
+        title: Text(widget.name),
+        centerTitle: true,
+      ),
+      body: FutureBuilder(
+          future: getdata(),
+          builder: (context, snapshot) {
+            if (!snapshot.hasData) {
+              return const Center(child: CircularProgressIndicator());
+            } else {
+              return ListView.builder(
+                  itemCount: employee.length,
+                  itemBuilder: (context, index) {
+                    return ListTile(
+                      title: Text(employee[index].name!),
+                      trailing: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          IconButton(
+                              onPressed: () {
+                                delete(employee[index].id!);
+                              },
+                              icon: const Icon(
+                                Icons.delete,
+                                color: Colors.red,
+                              )),
+                          IconButton(
+                              onPressed: () {
+                                name.text = employee[index].name!;
+                                email.text = employee[index].email!;
+                                designation.text = employee[index].designation!;
+                                phone.text = employee[index].phoneNo!;
+
+                                showDialog(
+                                    context: context,
+                                    builder: (context) {
+                                      return AlertDialog(
+                                        content: SizedBox(
+                                          height: 200,
+                                          child: Column(
+                                            children: [
+                                              TextField(
+                                                controller: name,
+                                                decoration:
+                                                    const InputDecoration(
+                                                        hintText: "name"),
+                                              ),
+                                              TextField(
+                                                controller: email,
+                                                decoration:
+                                                    const InputDecoration(
+                                                        hintText: "email"),
+                                              ),
+                                              TextField(
+                                                controller: designation,
+                                                decoration:
+                                                    const InputDecoration(
+                                                        hintText:
+                                                            "Designation"),
+                                              ),
+                                              TextField(
+                                                controller: phone,
+                                                decoration:
+                                                    const InputDecoration(
+                                                        hintText: "phone no"),
+                                              )
+                                            ],
+                                          ),
+                                        ),
+                                        actions: <Widget>[
+                                          MaterialButton(
+                                            onPressed: () {
+                                              Navigator.pop(context);
+                                            },
+                                            color: Colors.red,
+                                            textColor: Colors.white,
+                                            child: const Text('cancel'),
+                                          ),
+                                          MaterialButton(
+                                            onPressed: () {
+                                              update(
+                                                  employee[index].id!,
+                                                  name.text,
+                                                  email.text,
+                                                  designation.text,
+                                                  phone.text);
+                                              name.clear();
+                                              email.clear();
+                                              designation.clear();
+                                              phone.clear();
+                                              Navigator.pop(context);
+                                            },
+                                            color: Colors.green,
+                                            textColor: Colors.white,
+                                            child: const Text('Update'),
+                                          )
+                                        ],
+                                      );
+                                    });
+                              },
+                              icon: const Icon(
+                                Icons.edit,
+                                color: Colors.grey,
+                              )),
+                        ],
+                      ),
+                      subtitle: Text(employee[index].designation!),
+                    );
+                  });
+            }
+          }),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          showDialog(
+              context: context,
+              builder: (context) {
+                return AlertDialog(
+                  content: SizedBox(
+                    height: 200,
+                    child: Column(
+                      children: [
+                        TextField(
+                          controller: name,
+                          decoration: const InputDecoration(hintText: "name"),
+                        ),
+                        TextField(
+                          controller: email,
+                          decoration: const InputDecoration(hintText: "email"),
+                        ),
+                        TextField(
+                          controller: designation,
+                          decoration:
+                              const InputDecoration(hintText: "Designation"),
+                        ),
+                        TextField(
+                          controller: phone,
+                          decoration:
+                              const InputDecoration(hintText: "phone no"),
+                        )
+                      ],
+                    ),
+                  ),
+                  actions: <Widget>[
+                    MaterialButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                      color: Colors.red,
+                      textColor: Colors.white,
+                      child: const Text('cancel'),
+                    ),
+                    MaterialButton(
+                      onPressed: () {
+                        add(name.text, email.text, designation.text,
+                            phone.text);
+                        name.clear();
+                        email.clear();
+                        designation.clear();
+                        phone.clear();
+                        Navigator.pop(context);
+                      },
+                      color: Colors.green,
+                      textColor: Colors.white,
+                      child: const Text('Submit'),
+                    )
+                  ],
+                );
+              });
+        },
+        child: const Icon(Icons.add),
+      ),
+    );
   }
 }
