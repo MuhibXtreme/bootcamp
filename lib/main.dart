@@ -1,11 +1,18 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:from_ui/bottom_nav_bar.dart';
+import 'package:from_ui/firebase.dart';
+import 'package:from_ui/firstscreen.dart';
 import 'package:from_ui/googlemap.dart';
 import 'package:from_ui/home.dart';
 import 'package:from_ui/second_screen.dart';
+import 'package:from_ui/sign.dart';
 import 'package:from_ui/thirdscreen.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
+
   runApp(const MyApp());
 }
 
@@ -33,9 +40,7 @@ class MyApp extends StatelessWidget {
       // home: const Form(),
       initialRoute: 'form',
       routes: {
-        'form': (context) => Home(
-              name: '',
-            ),
+        'form': (context) => FirstScreen(),
         // 'home': (context) => Home(),
         'second': (context) => SecondScreen(),
       },
