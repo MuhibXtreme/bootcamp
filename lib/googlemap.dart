@@ -48,7 +48,6 @@ class _GoogleMappState extends State<GoogleMapp> {
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           getuserlocation().then((value) async {
-            
             marker.add(Marker(
                 markerId: const MarkerId('2'),
                 position: LatLng(value.latitude, value.longitude),
@@ -56,8 +55,6 @@ class _GoogleMappState extends State<GoogleMapp> {
 
             CameraPosition cameraPosition = CameraPosition(
                 target: LatLng(value.latitude, value.longitude), zoom: 14);
-
-
 
             final GoogleMapController controller = await _controller.future;
             controller
