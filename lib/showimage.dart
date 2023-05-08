@@ -16,6 +16,9 @@ class _ShowImageState extends State<ShowImage> {
       body: StreamBuilder(
           stream: FirebaseFirestore.instance.collection('images').snapshots(),
           builder: (context, snap) {
+            if (snap.connectionState == ConnectionState.waiting) {
+              return const Center(child: CircularProgressIndicator());
+            }
             return ListView.builder(
                 scrollDirection: Axis.horizontal,
                 itemCount: snap.data!.docs.length,

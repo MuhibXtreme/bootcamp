@@ -1,6 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:from_ui/firstscreen.dart';
+import 'package:from_ui/forgot_password.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Sigin extends StatefulWidget {
   const Sigin({super.key});
@@ -19,13 +21,17 @@ class _SiginState extends State<Sigin> {
   bool isvisible = false;
 
   void signin() async {
+    SharedPreferences prefdata = await SharedPreferences.getInstance();
     try {
       await FirebaseAuth.instance.signInWithEmailAndPassword(
           email: email.text, password: password.text);
+      if (context.mounted) {}
       ScaffoldMessenger.of(context)
           .showSnackBar(const SnackBar(content: Text('Successfully')));
-      Navigator.push(
-          context, MaterialPageRoute(builder: (context) => FirstScreen()));
+      Navigator.push(context,
+          MaterialPageRoute(builder: (context) => const FirstScreen()));
+
+      prefdata.setString('email', email.text);
     } catch (err) {
       ScaffoldMessenger.of(context)
           .showSnackBar(SnackBar(content: Text('$err')));
@@ -41,12 +47,12 @@ class _SiginState extends State<Sigin> {
       ),
       body: Form(
         key: formkey,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(20.0),
-              child: TextFormField(
+        child: Padding(
+          padding: const EdgeInsets.all(20.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              TextFormField(
                 controller: email,
                 decoration: const InputDecoration(
                     floatingLabelBehavior: FloatingLabelBehavior.always,
@@ -66,10 +72,10 @@ class _SiginState extends State<Sigin> {
                   }
                 },
               ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(20.0),
-              child: TextFormField(
+              const SizedBox(
+                height: 20,
+              ),
+              TextFormField(
                 obscureText: isvisible,
                 controller: password,
                 decoration: InputDecoration(
@@ -103,17 +109,27 @@ class _SiginState extends State<Sigin> {
                   }
                 },
               ),
-            ),
-            ElevatedButton(
-                onPressed: () {
-                  final isvalid = formkey.currentState!.validate();
-                  if (!isvalid) {
-                    return;
-                  }
-                  signin();
-                },
-                child: const Text('Sigin'))
-          ],
+              Align(
+                  alignment: Alignment.topRight,
+                  child: TextButton(
+                      onPressed: () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => const ForgotPassword()));
+                      },
+                      child: const Text('Forget Password?'))),
+              ElevatedButton(
+                  onPressed: () {
+                    final isvalid = formkey.currentState!.validate();
+                    if (!isvalid) {
+                      return;
+                    }
+                    signin();
+                  },
+                  child: const Text('Sigin'))
+            ],
+          ),
         ),
       ),
     );

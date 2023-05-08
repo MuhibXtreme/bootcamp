@@ -1,24 +1,27 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-
 import 'package:from_ui/firstscreen.dart';
-
 import 'package:from_ui/second_screen.dart';
 import 'package:from_ui/showimage.dart';
+import 'package:from_ui/sign.dart';
 
 import 'package:from_ui/thirdscreen.dart';
-
-import 'multiimage.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  SharedPreferences prefdata = await SharedPreferences.getInstance();
+  var email = prefdata.getString('email');
   await Firebase.initializeApp();
 
-  runApp(const MyApp());
+  runApp(MyApp(
+    email: email,
+  ));
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  final String? email;
+  const MyApp({this.email, super.key});
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -30,7 +33,8 @@ class MyApp extends StatelessWidget {
       // home: const Form(),
       initialRoute: 'form',
       routes: {
-        'form': (context) => const ShowImage(),
+        'form': (context) =>
+            email != null ? const FirstScreen() : const Sigin(),
         // 'home': (context) => Home(),
         'second': (context) => const SecondScreen(),
       },
