@@ -4,9 +4,12 @@ import 'package:from_ui/firstscreen.dart';
 import 'package:from_ui/second_screen.dart';
 import 'package:from_ui/showimage.dart';
 import 'package:from_ui/sign.dart';
+import 'package:from_ui/splash.dart';
 
 import 'package:from_ui/thirdscreen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import 'code_verify.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -34,7 +37,7 @@ class MyApp extends StatelessWidget {
       initialRoute: 'form',
       routes: {
         'form': (context) =>
-            email != null ? const FirstScreen() : const Sigin(),
+            email != null ? const FirstScreen() : const SplashScreen(),
         // 'home': (context) => Home(),
         'second': (context) => const SecondScreen(),
       },

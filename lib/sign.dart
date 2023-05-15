@@ -1,7 +1,10 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 import 'package:from_ui/firstscreen.dart';
 import 'package:from_ui/forgot_password.dart';
+import 'package:from_ui/phone_login.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class Sigin extends StatefulWidget {
@@ -17,6 +20,7 @@ class _SiginState extends State<Sigin> {
   TextEditingController password = TextEditingController();
 
   GlobalKey<FormState> formkey = GlobalKey<FormState>();
+  GoogleSignIn googleSignIn = GoogleSignIn();
 
   bool isvisible = false;
 
@@ -127,7 +131,87 @@ class _SiginState extends State<Sigin> {
                     }
                     signin();
                   },
-                  child: const Text('Sigin'))
+                  child: const Text('Sigin')),
+              Padding(
+                padding: const EdgeInsets.all(20.0),
+                child: GestureDetector(
+                  onTap: () {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const PhoneLogin()));
+                  },
+                  child: Container(
+                    height: 50,
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(50),
+                        border: Border.all(color: Colors.black)),
+                    child: const Center(child: Text('Login with phone no')),
+                  ),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(20.0),
+                child: GestureDetector(
+                  onTap: () async {
+                    try {
+                      var result = await googleSignIn.signIn();
+                      if (result != null) {
+                        final usedata = await result.authentication;
+
+                        final credential = GoogleAuthProvider.credential(
+                            accessToken: usedata.accessToken,
+                            idToken: usedata.idToken);
+                        await FirebaseAuth.instance
+                            .signInWithCredential(credential);
+
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => FirstScreen()));
+
+                        print(result.displayName);
+                        print(result.photoUrl);
+                        print(result.email);
+                      }
+                    } catch (e) {
+                      print(e);
+                    }
+                  },
+                  child: Container(
+                    height: 50,
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(50),
+                        border: Border.all(color: Colors.black)),
+                    child: const Center(child: Text('Continue with Google')),
+                  ),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(20.0),
+                child: GestureDetector(
+                  onTap: () async {
+                    try {
+                      // final LoginResult result = await FacebookAuth.instance
+                      //     .login(permissions: ['public_profile', 'email']);
+                      // if (result.status == LoginStatus.success) {
+                      //   final userdata =
+                      //       await FacebookAuth.instance.getUserData();
+                      //       print(userdata);
+                      // }
+                    } catch (e) {
+                      print(e);
+                    }
+                  },
+                  child: Container(
+                    height: 50,
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(50),
+                        border: Border.all(color: Colors.black)),
+                    child: const Center(child: Text('Continue with Facebook')),
+                  ),
+                ),
+              )
             ],
           ),
         ),
